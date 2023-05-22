@@ -23,8 +23,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server (optional starting in v4.7)
     await client.connect();
+    // Connect the client to the server (optional starting in v4.7)
+
     const toyCollection = client.db('magicalToyland').collection('toys');
 
     app.get('/toys', async (req, res) => {
@@ -78,6 +79,28 @@ async function run() {
       const result = await toyCollection.deleteOne({ _id: objectId });
       res.json(result);
     });
+
+  // Sorting toys in ascending order based on price
+console.log('Before sorting - ascending');
+toyCollection.find({}).sort({ price: 1 }).toArray((err, result) => {
+  if (err) {
+    console.error('Error fetching toys (ascending):', err);
+    return;
+  }
+
+  console.log('Toys sorted in ascending order based on price:', result);
+});
+
+// Sorting toys in descending order based on price
+console.log('Before sorting - descending');
+toyCollection.find({}).sort({ price: -1 }).toArray((err, result) => {
+  if (err) {
+    console.error('Error fetching toys (descending):', err);
+    return;
+  }
+
+  console.log('Toys sorted in descending order based on price:', result);
+});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
