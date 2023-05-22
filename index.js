@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -27,6 +27,14 @@ async function run() {
     // Connect the client to the server (optional starting in v4.7)
 
     const toyCollection = client.db('magicalToyland').collection('toys');
+
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+    app.get('/', (req, res) => {
+      res.send('Magical ToyLand Is Running');
+    });
 
     app.get('/toys', async (req, res) => {
       const email = req.query.email;
@@ -80,45 +88,37 @@ async function run() {
       res.json(result);
     });
 
-  // Sorting toys in ascending order based on price
-console.log('Before sorting - ascending');
-toyCollection.find({}).sort({ price: 1 }).toArray((err, result) => {
-  if (err) {
-    console.error('Error fetching toys (ascending):', err);
-    return;
-  }
+    // Sorting toys in ascending order based on price
+    console.log('Before sorting - ascending');
+    toyCollection.find({}).sort({ price: 1 }).toArray((err, result) => {
+      if (err) {
+        console.error('Error fetching toys (ascending):', err);
+        return;
+      }
 
-  console.log('Toys sorted in ascending order based on price:', result);
-});
+      console.log('Toys sorted in ascending order based on price:', result);
+    });
 
-// Sorting toys in descending order based on price
-console.log('Before sorting - descending');
-toyCollection.find({}).sort({ price: -1 }).toArray((err, result) => {
-  if (err) {
-    console.error('Error fetching toys (descending):', err);
-    return;
-  }
+    // Sorting toys in descending order based on price
+    console.log('Before sorting - descending');
+    toyCollection.find({}).sort({ price: -1 }).toArray((err, result) => {
+      if (err) {
+        console.error('Error fetching toys (descending):', err);
+        return;
+      }
 
-  console.log('Toys sorted in descending order based on price:', result);
-});
+      console.log('Toys sorted in descending order based on price:', result);
+    });
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    app.listen(port, () => {
+      console.log(`Magical ToyLand Server Is Running On Port: ${port}`);
+    });
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
   } finally {
     // Ensures that the client will close when you finish/error
-    //await client.close();
+    // await client.close();
   }
 }
 
 run().catch(console.dir);
-
-app.get('/', (req, res) => {
-  res.send('Magical ToyLand Is Running');
-});
-
-app.listen(port, () => {
-  console.log(`Magical ToyLand Server Is Running On Port: ${port}`);
-});
